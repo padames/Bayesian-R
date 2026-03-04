@@ -1,5 +1,5 @@
 # the st
-tstatistics=function(x,y) {
+tstatistic=function(x,y) {
   m <- length(x)
   n <- length(y)
   m  <- ifelse(m>0, m, NA)
