@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 
 library("here")
-library("purrr")
 
 # SCRIPT NAME:      sim_sig_given_alpha
 # ARGUMENTS:        N, the number of simulations to run
@@ -17,6 +16,19 @@ library("purrr")
 #                   through alpha (computed as qt(1-alpha/2, x_size+y_size-2))
 
 
+
+
+gen_normal_random_vector <- function(len, mean=0, sd=1) {
+  rnorm(len, mean=mean, sd=sd)
+}
+
+gen_samples <- function(num.simulations, fun_x, fun_y) {
+  x <- replicate( num.simulations, fun_x$f( fun_x$size ), simplify=FALSE )
+  y <- replicate( num.simulations, fun_y$f( fun_y$size ), simplify=FALSE )
+  list(x=x,y=y)
+}
+
+
 run_simulations <- function(alpha, x.sample.size, y.sample.size){
   set.seed(26763)
   source(here::here("R", "tstatistic.R"))
@@ -29,9 +41,14 @@ run_simulations <- function(alpha, x.sample.size, y.sample.size){
   one.qt <- qt(percentile, degrees.of.freedom)
   qt <- rep(one.qt, num.simulations)
   
-  x <- replicate(num.simulations, rnorm(x.sample.size, mean=0, sd=1), simplify=FALSE)
-  y <- replicate(num.simulations, rnorm(y.sample.size, mean=0, sd=1), simplify=FALSE)
+  f1 <- list( f=gen_normal_random_vector, size=x.sample.size )
+  f2 <- list( f=gen_normal_random_vector, size=y.sample.size )
   
+  res <- gen_samples(num.simulations = num.simulations, f1, f2)
+  
+  x <- res$x
+  y <- res$y
+
   t <- mapply(tstatistic, as.list(x), as.list(y))
   
   reject.criteria <- abs(t) > qt
@@ -39,8 +56,8 @@ run_simulations <- function(alpha, x.sample.size, y.sample.size){
   num.rejected <- sum(reject.criteria)
   
   return( num.rejected/num.simulations)
-  
 }
+
 
 # If the script is executed directly
 if (interactive() == FALSE) {

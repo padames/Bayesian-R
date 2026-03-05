@@ -1,0 +1,44 @@
+-   run_number: 1.0
+    population_one:
+    - standard normal
+    - '10'
+    population_two:
+    - standard normal
+    - '10'
+-   run_number: 2.0
+    population_one:
+    - standard normal
+    - '10'
+    population_two:
+    - normal
+    - '1'
+    - '10'
+    - '10'
+-   run_number: 3.0
+    population_one:
+    - t-student
+    - '4'
+    - '10'
+    population_two:
+    - t-student
+    - '4'
+    - '10'
+-   run_number: 4.0
+    population_one:
+    - exponential
+    - '4'
+    - '10'
+    population_two:
+    - exponential
+    - '4'
+    - '10'
+-   run_number: 5.0
+    population_one:
+    - normal
+    - '10'
+    - '2'
+    - '10'
+    population_two:
+    - exponential
+    - '0.1'
+    - '10'
