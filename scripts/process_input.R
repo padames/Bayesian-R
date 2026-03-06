@@ -13,7 +13,7 @@ suppressPackageStartupMessages({
 
 parse_population <- function(population_entry) {
     pop_type <- population_entry[[1]]
-    pop_args <- as.numeric(population_entry[-1])
+    pop_args <- as.numeric(population_entry[-1]) # all other entries
 
     if (any(is.na(pop_args))) {
         stop("Population parameters must be numeric after the type entry.")
@@ -74,11 +74,7 @@ parse_run <- function(a_run, num.simulations) {
     )
 }
 
-process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
-    if (!is.null(seed)) {
-        set.seed(seed)
-    }
-
+process_input <- function(file_name, num.simulations = 10000) {
     run_data <- yaml::read_yaml(file_name)
     run_ids <- purrr::map_chr(run_data, function(run) as.character(run$run_number))
     parsed_runs <- purrr::map(run_data, parse_run, num.simulations = num.simulations)
