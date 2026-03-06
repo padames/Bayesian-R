@@ -74,7 +74,10 @@ parse_run <- function(a_run, num.simulations) {
     )
 }
 
-process_input <- function(file_name, num.simulations = 10000) {
+process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
+    if( ! is.null(seed) ) {
+      set.seed(seed)
+    }
     run_data <- yaml::read_yaml(file_name)
     run_ids <- purrr::map_chr(run_data, function(run) as.character(run$run_number))
     parsed_runs <- purrr::map(run_data, parse_run, num.simulations = num.simulations)

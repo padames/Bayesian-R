@@ -1,0 +1,10 @@
+-   run_number: 1.0
+    population_one:
+        type: normal
+        mean: 10.0
+        sd: 2.0
+        size: 3
+    population_two:
+        type: exponential
+        rate: 0.1
+        size: 3

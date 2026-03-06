@@ -1,0 +1,9 @@
+-   run_number: 1.0
+    population_one:
+        type: exponential
+        rate: 4.0
+        size: 3
+    population_two:
+        type: exponential
+        rate: 4.0
+        size: 3

@@ -1,0 +1,7 @@
+-   run_number: 1.0
+    population_one:
+        type: standard normal
+        size: 3
+    population_two:
+        type: standard normal
+        size: 3
