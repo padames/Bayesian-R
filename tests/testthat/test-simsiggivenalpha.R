@@ -32,6 +32,6 @@ test_that("generate a vector of given lenght of randon normal standard values", 
   
   expected <- rnorm(vec.length)
   
-  expect_equal(length(expected), length(gen_normal_standard_random_vector(vec.length)))
+  expect_equal(length(expected), length(gen_normal_random_vector(vec.length)))
   
 })
