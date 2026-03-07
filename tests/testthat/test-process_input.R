@@ -25,6 +25,7 @@ test_that("parse_population processes population data correctly", {
   calc_output <- parse_population( a_population )
   browser()
   expect_equal(length(expected_output), length(calc_output))
+  expect_equal(expected_output$random_variate_fun$body, calc_output$random_variate_fun$body)
   expect_equal(expected_output$params, calc_output$params)
   expect_equal(length(expected_output$random_variate_fun), length(calc_output$random_variate_fun))
   expect_equal(expected_output$size, calc_output$size)
