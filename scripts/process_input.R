@@ -50,7 +50,7 @@ parse_population <- function(population_entry) {
     )
 }
 
-parse_run <- function(a_run, num.simulations) {
+parse_a_run <- function(a_run, num.simulations) {
     pop_one <- parse_population(a_run$population_one)
     pop_two <- parse_population(a_run$population_two)
 
@@ -78,12 +78,13 @@ process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
     if( ! is.null(seed) ) {
       set.seed(seed)
     }
-    run_data <- yaml::read_yaml(file_name)
-    run_ids <- purrr::map_chr(run_data, function(run) as.character(run$run_number))
-    parsed_runs <- purrr::map(run_data, parse_run, num.simulations = num.simulations)
-
+    all_runs <- yaml::read_yaml(file_name)
+    run_ids <- purrr::map_chr(all_runs, function(one_run) as.character(one_run$run_number))
+    parsed_runs <- purrr::map(all_runs, parse_a_run, num.simulations = num.simulations)
+    
     stats::setNames(parsed_runs, run_ids)
-    purrr::map(run_data, parse_run, num.simulations = num.simulations)
+    parsed_runs <- purrr::map(all_runs, parse_a_run, num.simulations = num.simulations)
+    return(parsed_runs)
 }
 
 # If the script is executed directly
