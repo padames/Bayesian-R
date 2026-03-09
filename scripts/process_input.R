@@ -112,6 +112,7 @@ process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
     if( ! is.null(seed) ) {
       set.seed(seed)
     }
+
     all_runs <- yaml::read_yaml(file_name)
     run_ids <- purrr::map_chr(all_runs, function(one_run) as.character(one_run$run_number))
     
@@ -122,12 +123,17 @@ process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
     return(parsed_runs)
 }
 
-# If the script is executed directly
-if (interactive() == FALSE) {
+# If the script is executed directly (not sourced by another script)
+if (interactive() == FALSE &&
+    sys.nframe() == 0L) { # this one guarantees no calling function
     args <- commandArgs(trailingOnly = TRUE)
 
     input_file <- if (length(args) >= 1) {
-      here::here("data", "input", args[[1]])
+      if (grepl("^https?://", args[[1]]) || file.exists(args[[1]])) {
+        args[[1]]
+      } else {
+        here::here("data", "input", args[[1]])
+      }
     } else {
         here::here("data", "input", "input_data_multi_run.yaml")
     }
