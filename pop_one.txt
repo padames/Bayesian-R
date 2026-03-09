@@ -1,0 +1,2 @@
+list(random_variate_fun = function (size, params) 
+rnorm(size), size = 3L, params = list())

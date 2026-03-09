@@ -1,0 +1,11 @@
+$random_variate_fun
+function(size, params) rnorm(size)
+<bytecode: 0x599139b74fc0>
+<environment: 0x59913c8b05f0>
+
+$size
+[1] 3
+
+$params
+list()
+

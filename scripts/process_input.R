@@ -15,6 +15,10 @@ parse_population <- function(population_entry) {
     pop_type <- population_entry[[1]]
     pop_args <- as.numeric(population_entry[-1]) # all other entries
 
+    if (length(pop_type) == 0) {
+      stop("The input should have a population type, none was defined!")  
+    }
+    
     if (any(is.na(pop_args))) {
         stop("Population parameters must be numeric after the type entry.")
     }
@@ -50,9 +54,15 @@ parse_population <- function(population_entry) {
     )
 }
 
-parse_a_run <- function(a_run, num.simulations) {
-    pop_one <- parse_population(a_run$population_one)
-    pop_two <- parse_population(a_run$population_two)
+# Name:              parse_a_run
+# Input:             the 
+parse_a_run <- function(populations.spec.for.this.run, num.simulations, seed = NULL) {
+    if( ! is.null(seed) ) {
+      set.seed(seed)
+    }
+    
+    pop_one <- parse_population(populations.spec.for.this.run$population_one)
+    pop_two <- parse_population(populations.spec.for.this.run$population_two)
 
     random_variate_fun_1 <- pop_one$random_variate_fun
     random_variate_fun_2 <- pop_two$random_variate_fun
@@ -68,10 +78,17 @@ parse_a_run <- function(a_run, num.simulations) {
         simplify = FALSE
     )
 
-    list(
+    # 
+    # print("--------------------------------------------------")
+    values.in.this.run.are.matrices.of.pop.size.by.num.sim <- list(
         x = do.call(cbind, x),
-        y = do.call(cbind, y) # this keeps consistent matrix structure: length of samples x num simulations even for edge cases lkike sample size 1
+        y = do.call(cbind, y) # this keeps consistent matrix structure: length of samples x num simulations even for edge cases like sample size 1
     )
+    # print(paste0("In the CUT: calculated_run. Here is calculated run:"))
+    # print(calculated_run)
+    # save(populations.spec.for.this.run, values.in.this.run.are.matrices.of.pop.size.by.num.sim, file = here("data","test","run_data"))
+    
+    return(values.in.this.run.are.matrices.of.pop.size.by.num.sim)
 }
 
 process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
@@ -80,6 +97,9 @@ process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
     }
     all_runs <- yaml::read_yaml(file_name)
     run_ids <- purrr::map_chr(all_runs, function(one_run) as.character(one_run$run_number))
+    
+    # debugonce(parse_a_run)
+    
     parsed_runs <- purrr::map(all_runs, parse_a_run, num.simulations = num.simulations)
     
     stats::setNames(parsed_runs, run_ids)

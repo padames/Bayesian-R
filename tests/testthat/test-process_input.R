@@ -36,6 +36,7 @@ test_that("parse_population processes population data correctly", {
 testthat::test_that("Both populations normally distributed, equal, centered and normalized", {
   expect <- list(list(x=matrix(data = c(-0.8371717, -0.4906859, -0.6937202, 2.4158352, -0.4405479, -1.4482049,  0.1340882,  0.4595894,  0.5747557), nrow = 3,byrow = T),
                       y=matrix(data = c(-1.0236557,  1.1022975, -0.5012581, -0.0151383, -0.4755931, -1.6290935, -0.9359486, -0.7094400, -1.1676193), nrow = 3, byrow = T)))
+  # debugonce(process_input)
   calc <- process_input(here("data","test","input_2_std_normal.yaml"), num.simulations = 3, seed = 1234)
   
   expect_equal(expect, calc, tolerance = 1e-5)
@@ -68,6 +69,8 @@ testthat::test_that("Both populations exponentially distributed with rate 4", {
 
 testthat::test_that("One population normally distributed the other exponential and rate 0.1", {
   
+  # debugonce(parse_a_run)
+  
   expect <- list(list(x=matrix(data = c(11.410487, 10.751271,  9.924739,  8.705962, 10.620524, 11.447952, 11.736362, 10.010014,  9.006522), nrow = 3, byrow = T),
                       y=matrix(data = c(0.09091824,  8.14205214,  9.25526209, 16.10286033,  0.29013252,  0.17095131,  0.07866976, 43.24563092, 34.25280541),  nrow = 3, byrow = T)))
   calc <- process_input(here("data","test","input_normal_exp.yaml"), 3, 1234)               
@@ -76,5 +79,32 @@ testthat::test_that("One population normally distributed the other exponential a
 })
 
 
-#parse_a_run
+
+testthat::test_that("parse a population works as expected on a happy path", {
+  
+  # debugonce(parse_population)
+  
+  load(file=here("data","test","in_pop_one"))
+  
+  load(file=here("data","test","out_pop_one"))
+  calculated <- parse_population(in_pop_one)
+  
+  expect_equal(out_pop_one, calculated)
+  
+  rm(in_pop_one, out_pop_one)
+})
+
+
+testthat::test_that("parse a run through the happy path", {
+  # browser()
+  # debugonce(parse_a_run)
+  
+  #loads: populations.spec.for.this.run 
+  #       values.in.this.run.are.matrices.of.pop.size.by.num.sim
+  load(file = here("data","test","run_data"))
+
+  calculated.values <- parse_a_run(populations.spec.for.this.run, num.simulations = 3, 1234)
+  
+  expect_equal(values.in.this.run.are.matrices.of.pop.size.by.num.sim, calculated.values, tolerance = 1e-5)
+})
 
