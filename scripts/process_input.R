@@ -11,6 +11,12 @@ suppressPackageStartupMessages({
     library("here")
 })
 
+
+# Name:              parse_population
+# Input:             A list with the population type and its parameters   
+# Output:            Generates the parametric functional forms and the parameter values
+#                    necessary to compute random samples from those functions.
+#                    This is the function where new types of populations would be added 
 parse_population <- function(population_entry) {
     pop_type <- population_entry[[1]]
     pop_args <- as.numeric(population_entry[-1]) # all other entries
@@ -55,7 +61,13 @@ parse_population <- function(population_entry) {
 }
 
 # Name:              parse_a_run
-# Input:             the 
+# Input:             The parametric specification to compute two population samples
+#                    The number of simulations
+#                    A seed if the function is called at the top level, as in unit testing.
+# Output:            The population matrices consisting of pseudo-random samples from each population.
+#                    More specifically, the output is a list of two matrices. 
+#                    Each matrix has as many rows as the size of the population sample
+#                    and as many columns as the number of Monte Carlo simulations requested.
 parse_a_run <- function(populations.spec.for.this.run, num.simulations, seed = NULL) {
     if( ! is.null(seed) ) {
       set.seed(seed)
@@ -78,27 +90,30 @@ parse_a_run <- function(populations.spec.for.this.run, num.simulations, seed = N
         simplify = FALSE
     )
 
-    # 
-    # print("--------------------------------------------------")
     values.in.this.run.are.matrices.of.pop.size.by.num.sim <- list(
         x = do.call(cbind, x),
         y = do.call(cbind, y) # this keeps consistent matrix structure: length of samples x num simulations even for edge cases like sample size 1
     )
-    # print(paste0("In the CUT: calculated_run. Here is calculated run:"))
-    # print(calculated_run)
+    # to generate test stubs:
     # save(populations.spec.for.this.run, values.in.this.run.are.matrices.of.pop.size.by.num.sim, file = here("data","test","run_data"))
     
     return(values.in.this.run.are.matrices.of.pop.size.by.num.sim)
 }
 
+
+# Name:              process_input
+# Input:             1. A valid file name stored in the file system or url
+#                    2. The number of simulations to generate population values.
+#                    3. The seed for the pseudo-random simulations. Required for reproducibility.
+# Output:            Generates the parametric functional forms and the parameter values
+#                    necessary to compute random samples from those functions.
+#                    This is the function where new types of populations would be added 
 process_input <- function(file_name, num.simulations = 10000, seed = NULL) {
     if( ! is.null(seed) ) {
       set.seed(seed)
     }
     all_runs <- yaml::read_yaml(file_name)
     run_ids <- purrr::map_chr(all_runs, function(one_run) as.character(one_run$run_number))
-    
-    # debugonce(parse_a_run)
     
     parsed_runs <- purrr::map(all_runs, parse_a_run, num.simulations = num.simulations)
     
