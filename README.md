@@ -77,3 +77,43 @@ The net effect is the following vector:
 [1] 0.02884408 0.72309794 4.49001842
 ```
 Which is then used in the vectorized expression `reject.criteria <- abs(t) > qt`. Both `t` and `qt` are numeric vectors. 
+
+## project organization
+
+The projects for each section of the chapters are organized as closely as possible to the following:
+```
+.
+├── data
+│   ├── input
+│   ├── processed
+│   ├── raw
+│   └── test
+├── images  
+├── R
+├── scripts
+└── tests
+    └── testthat
+```
+The root is represented by the `.` in the above diagram. Not shown are folders used by dependency manager packages like `renv`, which lock the versions of R and all project packages to make it easier to transfer to other machines or a container. 
+The folder R holds functions sourced individually by scripts. The files in the `scripts` folder can be written in any language, such as Bash, PowerShell, Python, or R, and are used to drive project execution. 
+
+Any script file should ideally be callable as a program from the command line with or without arguments. They should also be sourceable from other files. The latter property may expose internal functions for reuse in other scripts and allows unit testing of the scripts. 
+
+
+## Unit-testing
+
+Every function created in the `scripts` and `R` folders has corresponding unit tests in the folder `<project_root>/tests/testthat/`.
+Unit tests can be run by sourcing the individual file or by sourcing or executing at the command line the script `run_tests.R`:
+```r
+library(testthat)
+testthat::test_dir("tests/testthat/")
+```
+
+## Relative Paths
+
+To source files from different paths within the project, the package `here` is used extensively. It is based on the idea that every path descends from the top of the project like the root of a plant. Thus, to source a function in a file called `my_function.R` in the `R` folder and a test input file called `my_data.csv` in the `data` folder from a file in the `tests/testhat` path, one would use: 
+
+```r
+source(here("R","my_function.R"))
+test_data <- read.csv(here("data","test","my_data.csv"))
+```
