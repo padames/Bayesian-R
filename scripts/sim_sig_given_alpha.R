@@ -92,9 +92,9 @@ run_multiple_sims <- function(file.name, num.sim, alpha, seed=NULL) {
     set.seed(seed)
   }
   # browser()
-  print(file.name)
-  print(alpha)
-  print(num.sim)
+  # print(file.name)
+  # print(alpha)
+  # print(num.sim)
   parsed_runs <- process_input(file.name, num.simulations = num.sim, seed = seed)
   
   sig_levels <- purrr::map(parsed_runs, compute_one_test, alpha)

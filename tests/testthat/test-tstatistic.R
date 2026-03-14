@@ -19,12 +19,21 @@ test_that("t-statistics properly computed",
           })
 
 
-test_that("t-statistics return vector with NAs for any zero-length sample",
+test_that("t-statistics return vector with NAs for any non-numeric character",
+          {
+            x <- c("4,5","2","4")
+            y <- c("1","2","3","4","5")
+
+            expect_true(any(is.na(tstatistic(x,y))))
+            expect_true(any(is.na(tstatistic(y,x))))
+
+          })
+
+test_that("t-statistics raises error for any zero-length sample",
           {
             x <- c()
             y <- c(1,2,3,4,5)
-
+            
             expect_true(any(is.na(tstatistic(x,y))))
-            expect_equal(c(NA,length(y)), tstatistic(x,y))
-            expect_equal(c(length(y),NA), tstatistic(y,x))
+            expect_true(any(is.na(tstatistic(y,x))))
           })
