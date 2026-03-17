@@ -16,6 +16,7 @@
 suppressPackageStartupMessages({
   library("purrr")
   library("here")
+  library("knitr")
 })
 
 source(here::here("R", "tstatistic.R"))
@@ -110,7 +111,15 @@ if (interactive() == FALSE) {
   stopifnot(exprs = length(args) >= 1)
   
   alpha <- as.numeric(args[1])
-
+  
+  ifelse(length(args) > 1, 
+         fname <- args[2], 
+         fname <- paste0(paste("sig_levels",
+                               alpha,
+                               "default",
+                               sep = "-"),
+                         ".rds"))
+  
   cat(paste0("All significance tests will be done against a significance of ", alpha, "\n"))  
   
   file_name <- here("data","input", "input_data_multi_run.yaml")
@@ -120,5 +129,10 @@ if (interactive() == FALSE) {
                                   num.sim = 1000L,
                                   alpha = alpha)#,
                                   # seed=1234)
-  print(sig_levels)
+  #saveRDS(sig_levels, file = here("data", "processed", fname))
+
+  print(kable(data.frame(description=c("d1", "d2", "d3", "d4","d5"),
+                         true_sig=unlist(sig_levels))))
+
+  #print(sig_levels)
 }
