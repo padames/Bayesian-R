@@ -89,7 +89,7 @@ compute_one_test <- function(sims, alpha){
 }
 
 run_multiple_sims <- function(file.name, num.sim, alpha, seed=NULL) {
-  if (! is.null(seed)) {
+  if (! (is.null(seed) || is.na(seed) )) {
     set.seed(seed)
   }
   # browser()
@@ -98,41 +98,78 @@ run_multiple_sims <- function(file.name, num.sim, alpha, seed=NULL) {
   # print(num.sim)
   parsed_runs <- process_input(file.name, num.simulations = num.sim, seed = seed)
   
-  sig_levels <- purrr::map(parsed_runs, compute_one_test, alpha)
+  sig_levels <- purrr::map(parsed_runs$runs, compute_one_test, alpha)
   
-  return(sig_levels)
+  return(parsed_runssig_levels)
+} 
+
+run_multiple_sims2 <- function(file.name, num.sim, alpha, seed=NULL) {
+  if (! (is.null(seed) || is.na(seed) )) {
+    set.seed(seed)
+  }
+  # browser()
+  # print(file.name)
+  # print(alpha)
+  # print(num.sim)
+  parsed_runs <- process_input2(file.name, num.simulations = num.sim, seed = seed)
+  
+  sig_levels <- purrr::map(parsed_runs$runs, compute_one_test, alpha)
+  
+  return(list(labels=parsed_runs$labels, sig_levels=sig_levels))
 } 
 
 
 # If the script is executed directly
 if (interactive() == FALSE) {
+  cat("\n")
   
   args <- commandArgs(trailingOnly = TRUE )
-  stopifnot(exprs = length(args) >= 1)
   
-  alpha <- as.numeric(args[1])
+  if(length(args) > 0) {
+    alpha <- as.numeric(args[1])
+  } else {
+    alpha <- 0.1;
+  }
+  cat(paste0("True significance calculations will be done against a theoretical significance of ", alpha, "\n"))
   
-  ifelse(length(args) > 1, 
-         fname <- args[2], 
-         fname <- paste0(paste("sig_levels",
-                               alpha,
-                               "default",
-                               sep = "-"),
-                         ".rds"))
+  # arguments are always character strings in R
+  if( length(args) > 1 && !is.na(as.numeric(args[2]))) {
+    seed <- as.integer(as.numeric(args[2]))
+    cat(paste0("The fixed seed ", seed, ", will be used for the pseudo-random calculations\n"))
+  } else {
+    seed <- NULL
+    cat("No fixed seed set for the pseudo-random calculations. Results will vary from run to run\n")
+  }
   
-  cat(paste0("All significance tests will be done against a significance of ", alpha, "\n"))  
   
-  file_name <- here("data","input", "input_data_multi_run.yaml")
+  if(length(args) > 2) { 
+    input.file.name <- args[3]
+  } else {
+    input.file.name <- here("data","input", "input_data_multi_run.yaml")
+    cat(paste0("Reading input data from: ", input.file.name, "\n"))
+  }
+
+  ifelse(length(args) > 3, 
+         fname.results <- args[4], 
+         fname.results <- paste0(paste("sig_levels",
+                                       alpha,
+                                       "default",
+                                       sep = "-"),
+                                 ".rds"))
   
-  # print(paste0("File name in main script ", file_name))
-  sig_levels <- run_multiple_sims(file.name = file_name,
+  
+  
+  # print(paste0("File name in main script ", input.file.name))
+  results <- run_multiple_sims2(file.name = input.file.name,
                                   num.sim = 1000L,
-                                  alpha = alpha)#,
-                                  # seed=1234)
-  #saveRDS(sig_levels, file = here("data", "processed", fname))
+                                  alpha = alpha,
+                                  seed=seed)
+  #saveRDS(results$sig_levels, file = here("data", "processed", fname.results))
 
-  print(kable(data.frame(description=c("d1", "d2", "d3", "d4","d5"),
-                         true_sig=unlist(sig_levels))))
+  print(kable(data.frame(Description=results$labels,
+                         true_sig=unlist(results$sig_levels))))
+  
+  cat("\n")
 
-  #print(sig_levels)
+  #print(results$sig_levels)
 }
