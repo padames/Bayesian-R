@@ -120,17 +120,19 @@ test_data <- read.csv(here("data","test","my_data.csv"))
 
 ## Test the master scripts
 
-Chapter One of this book has a table with results of Montecarlo simulations 
-to compute the true significance level at which the null hypothesis of equal 
-population mean is rejected using the T statistic for five different scenarios.
-Each scenario consist of drawing samples a given small size from two 
+Chapter One of this book has a table with the results of Montecarlo simulations 
+to compute the true significance level at which the null hypothesis of equal
+population means is rejected using the T statistic for five different scenarios.
+Each scenario consists of drawing samples of a given small size from two 
 simulated populations of known statistical distributions.
-The scenarios ar designed to match or not the assumptions of the 
-T statistic to accurately decide the test of population mean equality 
-at a given theoretical significant level.
+The scenarios are designed to match the assumptions of the 
+T statistic about the populations' distribution and variance to different degrees
+of accuracy.
+The more radically different the assumptions, we expect the true significance will
+be from the theoretical one.
 
-The results show how much the simulated significance level deviate from the 
-theoretical one.
+The results show how much the simulated significance level deviates from the 
+theoretical one. 
 
 Run the following command at the terminal when the prompt is at the project root:
 
@@ -149,8 +151,9 @@ Reading input data from: /home/pablo/git/Bayesian-R/data/input/input_data_multi_
 |(3) t-student df=4 size=10; t-student df=4 size=10            |    0.101|
 |(4) exponential rate=4 size=10; exponential rate=4 size=10    |    0.090|
 |(5) normal mean=10 sd=2 size=10; exponential rate=0.1 size=10 |    0.146|
-
 ```
-
+One great advantage of running code is the flexibility of modifying inputs.
+To create different scenarios, one can use a script like `generate_input_run_data.R`
+and then feed that to the main script as the third parameter.
 
 
