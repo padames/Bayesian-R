@@ -117,3 +117,40 @@ To source files from different paths within the project, the package `here` is u
 source(here("R","my_function.R"))
 test_data <- read.csv(here("data","test","my_data.csv"))
 ```
+
+## Test the master scripts
+
+Chapter One of this book has a table with results of Montecarlo simulations 
+to compute the true significance level at which the null hypothesis of equal 
+population mean is rejected using the T statistic for five different scenarios.
+Each scenario consist of drawing samples a given small size from two 
+simulated populations of known statistical distributions.
+The scenarios ar designed to match or not the assumptions of the 
+T statistic to accurately decide the test of population mean equality 
+at a given theoretical significant level.
+
+The results show how much the simulated significance level deviate from the 
+theoretical one.
+
+Run the following command at the terminal when the prompt is at the project root:
+
+```bash
+ ./scripts/sim_sig_given_alpha.R 0.1 3989
+
+True significance calculations will be done against a theoretical significance of 0.1
+The fixed seed 3989, will be used for the pseudo-random calculations
+Reading input data from: /home/pablo/git/Bayesian-R/data/input/input_data_multi_run.yaml
+
+
+|Description                                                   | true_sig|
+|:-------------------------------------------------------------|--------:|
+|(1) standard normal size=10; standard normal size=10          |    0.099|
+|(2) standard normal size=10; normal mean=1 sd=10 size=10      |    0.148|
+|(3) t-student df=4 size=10; t-student df=4 size=10            |    0.101|
+|(4) exponential rate=4 size=10; exponential rate=4 size=10    |    0.090|
+|(5) normal mean=10 sd=2 size=10; exponential rate=0.1 size=10 |    0.146|
+
+```
+
+
+
