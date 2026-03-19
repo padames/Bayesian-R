@@ -2,6 +2,17 @@
 I found this wonderful book in the Use R! series from Springer. I have compiled expanded R code inspired by the simulation code presented in the book.
 I have added unit tests and proper project organization to the code in the hope that this may help students and readers of the book to improve their software engineering skills when writing R code.
 
+## After cloning
+
+To run scripts and tests reliably recover the environment by typing the following at the R console:
+
+```r
+renv::restore()
+```
+
+This gets you a consistent environment to run the R code in this project without colliding with any other versions of libraries used by other projects or installed in your computer at the user level.
+
+
 ## Chapter  One: An  Introduction to R
 
 Exploring the robustness of the t-statistic is an excellent first example of R's powerful expressiveness for numerical simulation and statistical computation.
