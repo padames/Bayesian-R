@@ -265,8 +265,13 @@ real    0m49.360s
 user    3m41.260s
 sys     0m6.307s
 ```
-Using a different seed used to cause different values and conclusions about the 
-true significance level for some cases. Below I show a different seed value.
+The calculated values for true significance, $\alpha^T$, were too sensitive
+to the specific seed used for the default number of simulations: 10,000.
+The value of the first case should be close to the theoretical, 0.1000.
+Increasing the number of simulations removed this sensitivity. 
+Below, I show an example of a different seed that used to cause oscillations
+when using a smaller total number of simulations per case, but with 500,000 is 
+stable at the expected theoretical value within three significant digits.
 
 ```bash
 ~/git/Bayesian-R$ time ./scripts/sim_sig_given_alpha.R 0.1 1234 500000
