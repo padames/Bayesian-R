@@ -1,10 +1,68 @@
-# Exercises and Examples From the Book Bayesian Computation with R, by Jim Albert
-I found this wonderful book in the Use R! series from Springer. I have compiled expanded R code inspired by the simulation code presented in the book.
-I have added unit tests and proper project organization to the code in the hope that this may help students and readers of the book to improve their software engineering skills when writing R code.
+# Exercises and Examples From the Bayesian Computation with R, by Jim Albert, Springer, 2007.
+I found this wonderful book in the Use R! series. 
+This repo contains refactored and expanded R code from the examples in the book.
+I have added unit tests and proper project organization with the intention of guiding students and readers towards disciplined software engineering skills when writing R simulation code.
 
 ## Chapter  One: An  Introduction to R
+### Exploring the Robustness of the t Statistic
 
-Exploring the robustness of the t-statistic is an excellent first example of R's powerful expressiveness for numerical simulation and statistical computation.
+The T statistic is used in sample theory to make inferences about the difference in the mean of two populations when using small independent samples.
+The assumptions about the populations are that they are normally distributed and that their variance are equal.
+
+If we wish to validate the following null hypothesis: 
+
+$$
+  H_0: \mu_x = \mu_y
+$$
+
+We can draw two small random samples: ${x_1, x_2, \ldots, x_n}$ of size $n$, and ${y_1, y_2, \ldots, y_m}$ of size $m$,
+sample means $\bar{X}$ and $\bar{Y}$, and sample standard deviations $s_x$ and $s_y$, from populations with means $\mu_x$ and $\mu_y$, and standard deviations $\sigma_x=\sigma_y$.
+
+Then the T statistic can model the difference between the population means:
+
+$$
+  T = \frac{(\bar{X} - \bar{Y}) - (\mu_x - \mu_y)}{S\sqrt{\frac{1}{n}+\frac{1}{m}}}
+$$
+
+where $S$ is a pooled sample distribution standard deviation, given by:
+
+$$
+  S = \sqrt{\frac{(m-1)s_x^2 + (n-1)s_y^2}{m+n-2}}
+$$
+
+Under the Null Hypothesis, the test statistic $T$ has a t-student distribution with $(m+n-2)$ degrees of freedom.
+
+A confidence interval can be built with:
+
+$$
+  (\bar{X} - \bar{Y}) \pm t_{\alpha/2}S\sqrt{\frac{1}{n}+\frac{1}{m}}
+$$
+
+$t_{\alpha/2}$ comes from the single-side t cumulative probability distribution at $1-\alpha$ confidence.  
+Thus, one would reject $H_0$ if $|T|>t_{m+n-2, \alpha/2}$.
+
+### Estimates of the true significance, $\alpha$
+
+In order to explore how robust is the T statistic when the populations are less 
+than idel for the model assumptions, we can simulate samples taken from normal 
+populations that have different standard deviations and from populations that 
+are not normally distributed.
+We could also explore the sensitivity to sample size and population mean for 
+normally distributed populations.
+In each case the value we can compute, an estimate of the true significance, 
+$\alpha^T$ can be estimated via:
+
+$$
+  \alpha^T = P(|T|>t_{n+m-2,\alpha/2})
+$$
+
+We can estimate this probability numerically by counting how many samples satisfy 
+the inequality and dividing by the total number of samples, $N$:
+
+$$
+  \hat{\alpha}^T = \frac{\text{Number of rejections of}H_0}{N}
+$$
+
 I took the liberty of refactoring the original code to avoid the for loop, preferring a vectorized form with a more functional flavour.
 To be concrete, I changed the original version:
 
@@ -78,7 +136,7 @@ The net effect is the following vector:
 ```
 Which is then used in the vectorized expression `reject.criteria <- abs(t) > qt`. Both `t` and `qt` are numeric vectors. 
 
-## project organization
+## Project organization
 
 The projects for each section of the chapters are organized as closely as possible to the following:
 ```
@@ -157,3 +215,92 @@ To create different scenarios, one can use a script like `generate_input_run_dat
 and then feed that to the main script as the third parameter.
 
 
+## Further thoughts.
+
+The sensitivity of the values to the actual value of the random seed suggests 
+the number of simulations can be increased for more stable estimates.
+This required more code changes to improve the speed of the code when increasing the
+number of Montecarlo simulations from the original 10,000 to 500,000 per case.
+
+The AI suggestions for my Ubuntu 24.04 machine with R 4.5.2 was to use `parallel::mclapply` 
+instead of purrr:map in critical sections. Also for reproducible pseudo-random
+sampling to use `RNGkind("L'Ecuyer-CMRG")` before setting the seed.
+
+The parallelization changes were reflected in the functions `process_input3` 
+and `run_multiple_sims3`.
+
+Now I can run 2,500,000 simulations for the 5 cases suggested in the book in
+under 4 minutes user time with any four digit seed to get similar values.
+
+```bash
+~/git/Bayesian-R$ time ./scripts/sim_sig_given_alpha.R 0.1 3990 500000
+
+True significance calculations will be done against a theoretical significance of 0.1
+The fixed seed 3990, will be used for the pseudo-random calculations
+You have set the number of simulations to 500000.
+Reading input data from: /home/pablo/git/Bayesian-R/data/input/input_data_multi_run.yaml
+
+
+|Description                                                   | true_sig|
+|:-------------------------------------------------------------|--------:|
+|(1) standard normal size=10; standard normal size=10          | 0.100678|
+|(2) standard normal size=10; normal mean=1 sd=10 size=10      | 0.131440|
+|(3) t-student df=4 size=10; t-student df=4 size=10            | 0.096992|
+|(4) exponential rate=4 size=10; exponential rate=4 size=10    | 0.096442|
+|(5) normal mean=10 sd=2 size=10; exponential rate=0.1 size=10 | 0.154458|
+
+
+real    0m49.360s
+user    3m41.260s
+sys     0m6.307s
+```
+Using a different seed used to cause different values and conclusions about the 
+true significance level for some cases. Below I show a different seed value.
+
+```bash
+~/git/Bayesian-R$ time ./scripts/sim_sig_given_alpha.R 0.1 1234 500000
+
+True significance calculations will be done against a theoretical significance of 0.1
+The fixed seed 1234, will be used for the pseudo-random calculations
+You have set the number of simulations to 500000.
+Reading input data from: /home/pablo/git/Bayesian-R/data/input/input_data_multi_run.yaml
+
+
+|Description                                                   | true_sig|
+|:-------------------------------------------------------------|--------:|
+|(1) standard normal size=10; standard normal size=10          | 0.100558|
+|(2) standard normal size=10; normal mean=1 sd=10 size=10      | 0.132186|
+|(3) t-student df=4 size=10; t-student df=4 size=10            | 0.097620|
+|(4) exponential rate=4 size=10; exponential rate=4 size=10    | 0.096628|
+|(5) normal mean=10 sd=2 size=10; exponential rate=0.1 size=10 | 0.153712|
+
+
+real    0m49.981s
+user    3m42.847s
+sys     0m6.372s
+```
+
+
+My laptop CPU specifications are:
+
+```bash
+~/git/Bayesian-R$ lscpu
+Architecture:             x86_64
+  CPU op-mode(s):         32-bit, 64-bit
+  Address sizes:          39 bits physical, 48 bits virtual
+  Byte Order:             Little Endian
+CPU(s):                   12
+  On-line CPU(s) list:    0-11
+Vendor ID:                GenuineIntel
+  Model name:             Intel(R) Core(TM) i7-10710U CPU @ 1.10GHz
+    CPU family:           6
+    Model:                166
+    Thread(s) per core:   2
+    Core(s) per socket:   6
+    Socket(s):            1
+    Stepping:             0
+    CPU(s) scaling MHz:   17%
+    CPU max MHz:          4700.0000
+    CPU min MHz:          400.0000
+
+```
