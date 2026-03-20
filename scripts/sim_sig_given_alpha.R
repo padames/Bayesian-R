@@ -17,6 +17,7 @@ suppressPackageStartupMessages({
   library("purrr")
   library("here")
   library("knitr")
+  library("parallel")
 })
 
 source(here::here("R", "tstatistic.R"))
@@ -118,6 +119,25 @@ run_multiple_sims2 <- function(file.name, num.sim, alpha, seed=NULL) {
   return(list(labels=parsed_runs$labels, sig_levels=sig_levels))
 } 
 
+run_multiple_sims3 <- function(file.name, num.sim, alpha, seed = NULL, num.workers = 12L) {
+  if (!(is.null(seed) || is.na(seed))) {
+    RNGkind("L'Ecuyer-CMRG")  # better reproducibility with parallel RNG
+    set.seed(seed)
+  }
+  
+  # parsed_runs <- process_input2(file.name, num.simulations = num.sim, seed = seed)
+  parsed_runs <- process_input3(file.name, num.simulations = num.sim, seed = seed, num.workers=num.workers)
+  
+  sig_levels <- parallel::mclapply(
+    parsed_runs$runs,
+    compute_one_test,
+    alpha = alpha,
+    mc.cores = num.workers,
+    mc.set.seed = TRUE
+  )
+  
+  list(labels = parsed_runs$labels, sig_levels = sig_levels)
+}
 
 # If the script is executed directly
 if (interactive() == FALSE) {
@@ -141,16 +161,23 @@ if (interactive() == FALSE) {
     cat("No fixed seed set for the pseudo-random calculations. Results will vary from run to run\n")
   }
   
-  
   if(length(args) > 2) { 
-    input.file.name <- args[3]
+    num.sim <- args[3]
+    cat(paste0("You have set the number of simulations to ", num.sim, ".\n"))
+  } else {
+    num.sim <- 1000L
+    cat(paste0("Default number of simulations set to: ", num.sim, ".\n"))
+  }
+  
+  if(length(args) > 3) { 
+    input.file.name <- args[4]
   } else {
     input.file.name <- here("data","input", "input_data_multi_run.yaml")
     cat(paste0("Reading input data from: ", input.file.name, "\n"))
   }
 
-  ifelse(length(args) > 3, 
-         fname.results <- args[4], 
+  ifelse(length(args) > 4, 
+         fname.results <- args[5], 
          fname.results <- paste0(paste("sig_levels",
                                        alpha,
                                        "default",
@@ -158,14 +185,22 @@ if (interactive() == FALSE) {
                                  ".rds"))
   
   
-  
   # print(paste0("File name in main script ", input.file.name))
-  results <- run_multiple_sims2(file.name = input.file.name,
-                                  num.sim = 1000L,
-                                  alpha = alpha,
-                                  seed=seed)
+  # results <- run_multiple_sims2(file.name = input.file.name,
+  #                                 num.sim = num.sim,
+  #                                 alpha = alpha,
+  #                                 seed=seed)
   #saveRDS(results$sig_levels, file = here("data", "processed", fname.results))
 
+  num_workers <- detectCores()
+  
+  results <- run_multiple_sims3(file.name = input.file.name,
+                                  num.sim = num.sim,
+                                  alpha = alpha,
+                                  seed=seed,
+                                  num.workers = num_workers)
+  
+  
   print(kable(data.frame(Description=results$labels,
                          true_sig=unlist(results$sig_levels))))
   

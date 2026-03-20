@@ -233,11 +233,31 @@ process_input2 <- function(file_name, num.simulations = 10000, seed = NULL) {
     
     stats::setNames(parsed_runs, run_ids)
     
-    parsed_runs <- purrr::map(all_runs, parse_a_run, num.simulations = num.simulations)
-    
     return(list(labels=labels,runs=parsed_runs))
 }
 
+
+process_input3 <- function(file_name, num.simulations = 10000, seed = NULL, num.workers = 12L) {
+  if (!is.null(seed)) {
+    RNGkind("L'Ecuyer-CMRG")
+    set.seed(seed)
+  }
+  
+  all_runs <- yaml::read_yaml(file_name)
+  labels <- vapply(all_runs, run_to_string, character(1))
+  run_ids <- purrr::map_chr(all_runs, ~ as.character(.x$run_number))
+  
+  parsed_runs <- parallel::mclapply(
+    all_runs,
+    parse_a_run2,
+    num.simulations = num.simulations,
+    mc.cores = num.workers,
+    mc.set.seed = TRUE
+  )
+  
+  parsed_runs <- stats::setNames(parsed_runs, run_ids)
+  list(labels = labels, runs = parsed_runs)
+}
 
 
 # If the script is executed directly (not sourced by another script)
