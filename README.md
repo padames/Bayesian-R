@@ -3,6 +3,17 @@ I found this wonderful book in the Use R! series.
 This repo contains refactored and expanded R code from the examples in the book.
 I have added unit tests and proper project organization with the intention of guiding students and readers towards disciplined software engineering skills when writing R simulation code.
 
+## After cloning
+
+To run scripts and tests reliably recover the environment by typing the following at the R console:
+
+```r
+renv::restore()
+```
+
+This gets you a consistent environment to run the R code in this project without colliding with any other versions of libraries used by other projects or installed in your computer at the user level.
+
+
 ## Chapter  One: An  Introduction to R
 ### Exploring the Robustness of the t Statistic
 
