@@ -114,7 +114,7 @@ run_simulations <- function(alpha, x.sample.size, y.sample.size){
 }
 ```
 Although it may seem harder to interpret, the latter form processes all the simulation samples in one pass.
-The iteration is contained in the `mapply` function call. The function receives two lists of vectors, below for a case  of 3 simulations and samples of size 4 in each case:
+The iteration is contained in the `mapply` function call. The function receives two lists of vectors, `x` and `y` below for a case consisting of 3 simulations and samples size 4 in each case:
 
 ```
 > x
