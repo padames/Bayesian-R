@@ -1,5 +1,6 @@
 # Exercises and Examples From the Bayesian Computation with R, by Jim Albert, Springer, 2007.
 I found this wonderful book in the Use R! series. 
+It is a great way to learn both statistical principles and the core of coding with R to answer statistical questions using numerical simulation.
 This repo contains refactored and expanded R code from the examples in the book.
 I have added unit tests and proper project organization with the intention of guiding students and readers towards disciplined software engineering skills when writing R simulation code.
 
