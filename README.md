@@ -185,7 +185,9 @@ testthat::test_dir("tests/testthat/")
 
 ## Relative Paths
 
-To source files from different paths within the project, the package `here` is used extensively. It is based on the idea that every path descends from the top of the project like the root of a plant. Thus, to source a function in a file called `my_function.R` in the `R` folder and a test input file called `my_data.csv` in the `data` folder from a file in the `tests/testhat` path, one would use: 
+To source files from different paths within the project, the package `here` is used extensively.
+It is based on the idea that every path descends from the top of the project like the roots of a plant.
+Thus, to source a function in a file called `my_function.R` in the `R` folder and a test input file called `my_data.csv` in the `data` folder from a file in the `tests/testhat` path, one would use: 
 
 ```r
 source(here("R","my_function.R"))
@@ -246,7 +248,7 @@ The parallelization changes were reflected in the functions `process_input3`
 and `run_multiple_sims3`.
 
 Now I can run 2,500,000 simulations for the 5 cases suggested in the book in
-under 4 minutes user time with any four digit seed to get similar values.
+under 4 minutes user time with any four digit seed. The seed makes the results reproducible in any machine.
 
 ```bash
 ~/git/Bayesian-R$ time ./scripts/sim_sig_given_alpha.R 0.1 3990 500000
