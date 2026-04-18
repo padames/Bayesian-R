@@ -6,7 +6,7 @@ I have added unit tests and proper project organization with the intention of gu
 
 This is particularly important for students and researchers in the sciences because they usually have the need to do computational statistics, however they lack the training of a software engineer to develop modular, consistent, and sharable software projects. 
 Writing testable code leads to modularity which also leads to ease of modification. 
-Thus promoting the culture of unit testing and integration testing among scientific-oriented coders is a main goal of this repo.
+Thus promoting the culture of unit testing and integration testing among scientific-oriented coders is an important goal of this repo.
 
 ## After cloning
 
